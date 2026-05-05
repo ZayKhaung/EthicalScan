@@ -1,0 +1,646 @@
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<style>
+
+:root {
+  --bg-main: #070b10;
+  --bg-secondary: #0c1218;
+  --bg-card: rgba(15, 23, 32, 0.75);
+
+  --accent: #00ffc6;
+  --accent-soft: #00cfa0;
+
+  --text-main: #e6fff9;
+  --text-secondary: #7f9e96;
+
+  --border: rgba(0, 255, 198, 0.12);
+
+  --radius-md: 10px;
+  --radius-lg: 16px;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #0b1620, #05080c 60%);
+  color: var(--text-main);
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.search-row input {
+  background: #0a141c;
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  outline: none;
+}
+
+.search-row input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(0,255,198,0.15);
+}
+
+.search-row button {
+  background: linear-gradient(135deg, #00ffc6, #00cfa0);
+  color: #001a14;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 10px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.search-row button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px rgba(0,255,198,0.25);
+}
+
+.product-card,
+.result-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  transition: 0.25s;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+}
+
+.product-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 50px rgba(0,255,198,0.15);
+}
+
+.product-card.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 25px rgba(0,255,198,0.25);
+}
+
+.brand-tab {
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  border-radius: 999px;
+  padding: 5px 14px;
+  transition: 0.2s;
+}
+
+.brand-tab:hover,
+.brand-tab.active {
+  background: var(--accent);
+  color: #00221b;
+  border-color: var(--accent);
+}
+
+.hero-title {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.hero-sub {
+  color: var(--text-secondary);
+}
+
+.result-summary {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+}
+
+.ai-box {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.ai-header {
+  background: rgba(255,255,255,0.02);
+}
+
+* {
+  box-sizing: border-box;
+}
+* {
+  box-sizing: border-box;
+}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  .page { max-width: 680px; margin: 0 auto; padding: 2.5rem 1rem; }
+  .logo { font-size: 13px; font-weight: 500; letter-spacing: 0.12em; color: var(--color-text-secondary); text-transform: uppercase; margin-bottom: 3rem; }
+  .logo span { color: var(--color-text-primary); }
+  .hero-title { font-size: 36px; font-weight: 500; line-height: 1.2; color: var(--color-text-primary); margin-bottom: 0.75rem; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; }
+  .hero-sub { font-size: 15px; color: var(--color-text-secondary); line-height: 1.6; margin-bottom: 2rem; max-width: 460px; }
+  .criteria-row { display: flex; gap: 7px; margin-bottom: 2.5rem; }
+  .crit-pill { font-size: 11px; padding: 4px 10px; border-radius: 99px; border: 0.5px solid var(--color-border-secondary); color: var(--color-text-secondary); background: var(--color-background-secondary); }
+  .search-row { display: flex; gap: 8px; margin-bottom: 2.5rem; }
+  .search-row input { flex: 1; padding: 10px 14px; font-size: 14px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); outline: none; }
+  .search-row input:focus { border-color: var(--color-border-primary); }
+  .search-row button { padding: 10px 18px; font-size: 14px; font-weight: 500; background: var(--color-text-primary); color: var(--color-background-primary); border: none; border-radius: var(--border-radius-md); cursor: pointer; white-space: nowrap; }
+  .search-row button:hover { opacity: 0.85; }
+  .brand-tabs { display: flex; gap: 6px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .brand-tab { padding: 5px 14px; font-size: 12px; font-weight: 500; border: 0.5px solid var(--color-border-secondary); border-radius: 99px; cursor: pointer; background: transparent; color: var(--color-text-secondary); transition: all 0.15s; }
+  .brand-tab.active, .brand-tab:hover { background: var(--color-text-primary); color: var(--color-background-primary); border-color: var(--color-text-primary); }
+  .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 10px; margin-bottom: 2rem; }
+  .product-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 14px; cursor: pointer; transition: border-color 0.15s; }
+  .product-card:hover { border-color: var(--color-border-primary); }
+  .product-card.selected { border: 1.5px solid var(--color-text-primary); }
+  .product-icon { font-size: 24px; margin-bottom: 8px; }
+  .product-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 3px; }
+  .product-brand { font-size: 11px; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.07em; }
+  .result-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.5rem; margin-top: 0.5rem; }
+  .result-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.25rem; gap: 1rem; }
+  .result-title { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 3px; }
+  .result-brand-tag { font-size: 11px; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.07em; }
+  .score-badge { display: flex; flex-direction: column; align-items: center; padding: 10px 16px; border-radius: var(--border-radius-md); min-width: 64px; flex-shrink: 0; }
+  .score-badge.schlecht { background: #FCEBEB; color: #A32D2D; }
+  .score-badge.mittel { background: #FAEEDA; color: #854F0B; }
+  .score-badge.gut { background: #EAF3DE; color: #3B6D11; }
+  .score-num { font-size: 22px; font-weight: 500; line-height: 1; }
+  .score-label { font-size: 10px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; margin-top: 3px; opacity: 0.75; }
+  .issues { list-style: none; margin-bottom: 1.25rem; }
+  .issues li { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; padding: 5px 0; border-top: 0.5px solid var(--color-border-tertiary); }
+  .issues li:first-child { border-top: none; }
+  .issue-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .dot-red { background: #E24B4A; }
+  .dot-amber { background: #EF9F27; }
+  .dot-green { background: #639922; }
+  .result-summary { font-size: 13px; color: var(--color-text-secondary); line-height: 1.7; background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 14px; margin-bottom: 1rem; }
+  .ai-box { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); overflow: hidden; }
+  .ai-header { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--color-background-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); cursor: pointer; }
+  .ai-header-label { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.08em; flex: 1; }
+  .ai-dot { width: 7px; height: 7px; border-radius: 50%; background: #639922; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .ai-body { padding: 12px 14px; font-size: 13px; color: var(--color-text-secondary); line-height: 1.7; display: none; }
+  .ai-body.open { display: block; }
+  .ai-analyse-btn { display: block; width: 100%; margin-top: 0.75rem; padding: 9px; font-size: 13px; font-weight: 500; background: transparent; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); cursor: pointer; color: var(--color-text-primary); }
+  .ai-analyse-btn:hover { background: var(--color-background-secondary); }
+  .ai-loading { font-size: 13px; color: var(--color-text-secondary); padding: 12px 14px; font-style: italic; display: none; }
+  .section-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-secondary); margin-bottom: 0.75rem; }
+  .divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 3rem 0; }
+  .project-section { margin-top: 1rem; }
+  .project-section h2 { font-size: 22px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 0.5rem; }
+  .project-section p { font-size: 14px; color: var(--color-text-secondary); line-height: 1.7; margin-bottom: 1rem; }
+  .criteria-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 1rem 0 1.5rem; }
+  .criteria-item { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 12px; font-size: 13px; color: var(--color-text-secondary); line-height: 1.4; }
+  .criteria-item strong { display: block; font-size: 12px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 2px; }
+  .quote-block { border-left: 2px solid var(--color-border-secondary); padding: 10px 14px; margin: 1rem 0; font-size: 13px; color: var(--color-text-secondary); font-style: italic; line-height: 1.7; }
+  @media (prefers-color-scheme: dark) {
+    .score-badge.schlecht { background: #501313; color: #F09595; }
+    .score-badge.mittel { background: #412402; color: #FAC775; }
+    .score-badge.gut { background: #173404; color: #C0DD97; }
+  }
+</style>
+
+<div class="page">
+  <div class="logo"><span>Ethical</span>Scan</div>
+  <h1 class="hero-title">Wissen, was wirklich<br>in deinen Lieblingssüßigkeiten steckt.</h1>
+  <p class="hero-sub">Scanne oder durchsuche Produkte von Kinder, Nestlé und Ferrero – direkt beim Einkaufen, ohne komplexe Datenbanken.</p>
+
+  <div class="criteria-row">
+    <span class="crit-pill">Ökologische Nachhaltigkeit</span>
+    <span class="crit-pill">Bio-Rohstoffe</span>
+    <span class="crit-pill">Nutriscore</span>
+    <span class="crit-pill">Lieferketten-Transparenz</span>
+    <span class="crit-pill">Greenwashing-Check</span>
+    <span class="crit-pill">Faire Löhne</span>
+    <span class="crit-pill">Arbeitsbedingungen</span>
+  </div>
+
+  <div class="search-row">
+    <input type="text" id="searchInput" placeholder="Produkt suchen, z. B. Nutella …" oninput="filterProducts()" />
+    <button onclick="scanSelected()">Scannen ↗</button>
+    <div id="reader" style="width:100%; max-width:400px; margin-bottom:1rem;"></div>
+<button onclick="startScanner()" class="ai-analyse-btn">📷 Barcode scannen</button>
+  </div>
+
+  <div class="brand-tabs">
+    <button class="brand-tab active" onclick="filterBrand('all', this)">Alle</button>
+    <button class="brand-tab" onclick="filterBrand('Ferrero', this)">Ferrero</button>
+    <button class="brand-tab" onclick="filterBrand('Nestlé', this)">Nestlé</button>
+    <button class="brand-tab" onclick="filterBrand('Kinder', this)">Kinder</button>
+  </div>
+
+  <div class="section-label" id="gridLabel">Produkt auswählen</div>
+  <div class="products-grid" id="productsGrid"></div>
+  <div id="resultArea"></div>
+
+  <hr class="divider" />
+
+<hr class="divider" />
+
+<div class="project-section">
+  <div class="section-label">Über das Projekt</div>
+
+  <br>
+
+  <h2>Warum EthicalScan?</h2>
+  <br>
+  <p>
+    Beim Einkaufen ist es fast unmöglich zu erkennen, unter welchen Bedingungen Produkte wirklich hergestellt wurden.
+    Große Marken kommunizieren Nachhaltigkeit, doch oft bleibt unklar, was tatsächlich dahinter steckt.
+  </p>
+
+  <p>
+    EthicalScan wurde entwickelt, um genau diese Lücke zu schließen:
+    Eine einfache Möglichkeit, Produkte direkt im Supermarkt kritisch zu bewerten, ohne komplizierte Datenbanken oder lange Recherchen.
+  </p>
+
+  <div class="quote-block">
+    „Wir wollen sichtbar machen, was Marken zeigen – und was sie verschweigen.“
+  </div>
+
+  <!-- criterea -->
+  <div class="section-label" style="margin-top:2rem;">Was wir wirklich prüfen</div>
+
+  <div class="criteria-grid">
+
+    <div class="criteria-item">
+      <strong>Ökologische Nachhaltigkeit</strong>
+      CO₂-Ausstoß, Wasserverbrauch und Umweltfolgen wie Entwaldung oder Monokulturen entlang der gesamten Produktion.
+    </div>
+
+    <div class="criteria-item">
+      <strong>Bio-Rohstoffe</strong>
+      Anteil und Glaubwürdigkeit zertifizierter Bio-Zutaten, inklusive Prüfung, ob „Bio“ tatsächlich relevant ist oder nur Marketing.
+    </div>
+
+    <div class="criteria-item">
+      <strong>Nutri-Score & Gesundheit</strong>
+      Bewertung von Zucker, Fett und Zusatzstoffen. Stark verarbeitete und zuckerreiche Produkte werden kritisch eingeordnet.
+    </div>
+
+    <div class="criteria-item">
+      <strong>Lieferketten-Transparenz</strong>
+      Wie genau Unternehmen ihre Lieferketten offenlegen, von Rohstoffquelle bis Endprodukt.
+    </div>
+
+    <div class="criteria-item">
+      <strong>Greenwashing-Check</strong>
+      Analyse, ob Nachhaltigkeitsversprechen belegbar sind oder ob sie nur als Marketingstrategie genutzt werden.
+    </div>
+
+    <div class="criteria-item">
+      <strong>Faire Löhne</strong>
+      Ob Produzenten existenzsichernde Einkommen erhalten oder weiterhin unter prekären Bedingungen arbeiten müssen.
+    </div>
+
+    <div class="criteria-item">
+      <strong>Arbeitsbedingungen</strong>
+      Risiken wie Kinderarbeit, Ausbeutung oder unsichere Arbeitsverhältnisse, besonders in globalen Lieferketten.
+    </div>
+
+  </div>
+
+  <!-- Scorebewertung -->
+  <div class="section-label" style="margin-top:2rem;">Wie unser Score entsteht</div>
+
+  <p>
+    Jeder EthicalScan-Score basiert auf einer gewichteten Bewertung mehrerer Faktoren.
+    Dabei kombinieren wir Umwelt-, Gesundheits- und Sozialkriterien zu einer Gesamtbewertung von 0 bis 100.
+  </p>
+
+  <div class="criteria-grid">
+
+    <div class="criteria-item">
+      <strong>Umwelt (30%)</strong>
+      Nachhaltigkeit der Produktion und ökologische Auswirkungen
+    </div>
+
+    <div class="criteria-item">
+      <strong>Gesundheit (20%)</strong>
+      Nährwerte, Zuckergehalt und Zusatzstoffe
+    </div>
+
+    <div class="criteria-item">
+      <strong>Transparenz (15%)</strong>
+      Offenlegung und Nachvollziehbarkeit der Lieferkette
+    </div>
+
+    <div class="criteria-item">
+      <strong>Greenwashing-Risiko (15%)</strong>
+      Differenz zwischen Marketing und belegbaren Fakten
+    </div>
+
+    <div class="criteria-item">
+      <strong>Faire Löhne (10%)</strong>
+      Bezahlung entlang der Lieferkette
+    </div>
+
+    <div class="criteria-item">
+      <strong>Arbeitsbedingungen (10%)</strong>
+      Sicherheit, Rechte und ethische Standards
+    </div>
+
+  </div>
+
+  <div class="quote-block">
+    „Ein hoher Score bedeutet nicht perfekte Nachhaltigkeit – sondern weniger Probleme im Vergleich.“
+  </div>
+
+  <!-- Quellen -->
+  <div class="section-label" style="margin-top:2rem;">Unsere Methodik</div>
+
+  <p>
+    Unsere Bewertungen basieren nicht nur auf Unternehmensangaben,
+    sondern auch auf Berichten von NGOs, wissenschaftlichen Studien und unabhängigen Audits.
+  </p>
+
+  <p>
+    Besonders wichtig ist der Unterschied zwischen Image und Realität:
+    Produkte mit starkem Nachhaltigkeits-Marketing, aber schwacher Faktenlage,
+    werden im Greenwashing-Check deutlich abgewertet.
+  </p>
+
+  <p>
+    EthicalScan soll keine perfekte Wahrheit liefern,
+    sondern Konsumenten helfen, bessere und bewusstere Entscheidungen zu treffen.
+  </p>
+
+</div>
+
+<script>
+const products = [
+  { id: 1, name: "Nutella", brand: "Ferrero", icon: "🫙", score: 38, grade: "schlecht",
+    issues: [
+      { color: "dot-red", text: "Palmölbeschaffung mit Entwaldung in Indonesien und Malaysia verbunden" },
+      { color: "dot-red", text: "Kinderarbeitsrisiken in Kakaoketten (Elfenbeinküste, Ghana)" },
+      { color: "dot-amber", text: "Hoher Zuckergehalt – 57 g pro 100 g – gibt Anlass zu Gesundheitsbedenken" },
+      { color: "dot-amber", text: "RSPO-Mitgliedschaft, aber begrenzte Mengen nachweislich nachhaltig" },
+      { color: "dot-green", text: "Ferrero veröffentlicht jährliche CSR-Berichte mit Rückverfolgungsdaten" }
+    ],
+    summary: "Nutella bleibt trotz Ferreros öffentlicher Versprechen ethisch umstritten. Palmöl- und Kakao-Lieferkettenprobleme bestehen weiterhin, wenngleich es Fortschritte bei der Rückverfolgbarkeit gibt.",
+    aiAnalysis: "Die KI bewertet Nutella als eines der ethisch problematischsten Massenprodukte in seiner Kategorie. Besonders kritisch: die Kombination aus Palmöl- und Kakao-Risiken trifft gleichzeitig auf Umwelt- und Menschenrechtsebene. Das RSPO-Zertifikat deckt laut NGO-Berichten nur einen Bruchteil der tatsächlich verarbeiteten Palmölmengen ab. Für Verbraucher, die Greenwashing erkennen wollen, ist Nutella ein Lehrbeispiel: Die Marke kommuniziert Nachhaltigkeit stark, liefert aber bisher keine vollständige Transparenz."
+  },
+  { id: 2, name: "Kinder Bueno", brand: "Kinder", icon: "🍫", score: 44, grade: "mittel",
+    issues: [
+      { color: "dot-amber", text: "Palmöl enthalten – Ferrero ist RSPO-zertifiziert, aber Lücken bleiben" },
+      { color: "dot-amber", text: "Kakaobeschaffung: anhaltende Kinderarbeitsrisiken in Westafrika" },
+      { color: "dot-green", text: "Ferrero verpflichtete sich zu 100 % zertifiziertem Kakao bis 2020 (teilweise erreicht)" },
+      { color: "dot-green", text: "Verbesserte Recyclingfähigkeit der Verpackung in den letzten Jahren" }
+    ],
+    summary: "Kinder Bueno schneidet etwas besser als Nutella ab – dank Verpackungsverbesserungen und teilweiser Kakaozertifizierung. Ethische Risiken in der Lieferkette bleiben jedoch ein Problem.",
+    aiAnalysis: "Im Vergleich zu Nutella zeigt Kinder Bueno minimale Fortschritte, vor allem durch Verpackungsverbesserungen. Die KI hebt hervor, dass Ferrero-weite Maßnahmen wie die Kakao-Zertifizierung zwar positiv sind, aber das Ziel für 2020 verfehlt wurde. Für einen bewussteren Konsum empfiehlt die KI, zertifizierte Alternativen kleinerer Hersteller mit nachweisbarer Lieferkette zu bevorzugen."
+  },
+  { id: 3, name: "Ferrero Rocher", brand: "Ferrero", icon: "🍬", score: 42, grade: "mittel",
+    issues: [
+      { color: "dot-red", text: "Haselnussbeschaffung: Berichte über Ausbeutung von Wanderarbeitern in der Türkei" },
+      { color: "dot-amber", text: "Palmöl in der Füllung – Nachhaltigkeitszertifizierung uneinheitlich" },
+      { color: "dot-amber", text: "Premium-Positionierung vs. geringe Löhne in Zulieferbetrieben" },
+      { color: "dot-green", text: "Ferrero-Stiftung fördert Gemeinschaftsprojekte in Kakaoanbauregionen" }
+    ],
+    summary: "Ferreros Haselnuss-Lieferkette steht unter Beobachtung, da erhebliche Teile der Weltproduktion aus der Türkei stammen, wo Berichte über Arbeitsrechtsverletzungen vorliegen.",
+    aiAnalysis: "Die KI identifiziert hier ein klassisches Greenwashing-Muster: Der Premium-Preis von Ferrero Rocher suggeriert höhere Qualität und Verantwortung, die Arbeitsbedingungen in der Haselnuss-Lieferkette entsprechen dem aber nicht. Laut ILO-Daten arbeiten in türkischen Haselnussplantagen jährlich hunderttausende Saisonarbeiter unter teils prekären Bedingungen. Ferreros Stiftungsprojekte sind real, aber strukturell unzureichend."
+  },
+  { id: 4, name: "Nestlé KitKat", brand: "Nestlé", icon: "🍭", score: 31, grade: "schlecht",
+    issues: [
+      { color: "dot-red", text: "Nestlé in Klagen wegen Kinder- und Zwangsarbeit in der Kakaobeschaffung verwickelt" },
+      { color: "dot-red", text: "Anhaltende Kontroverse um Wasserrechte und Privatisierung" },
+      { color: "dot-red", text: "Fortschritte im Cocoa Plan laut Audits 2023 unzureichend" },
+      { color: "dot-amber", text: "Palmölbeschaffung vom Rainforest Action Network beanstandet" },
+      { color: "dot-green", text: "UTZ/Rainforest-Alliance-Zertifizierung für einige Kakaochargen" }
+    ],
+    summary: "Nestlé steht unter den hier bewerteten Marken vor den schwerwiegendsten ethischen Vorwürfen – von Kakaoklagen bis hin zu Wasserrechtsproblemen. Reformen kommen nur langsam voran.",
+    aiAnalysis: "KitKat ist laut KI-Bewertung das ethisch kritischste Produkt in diesem Vergleich. Nestlé wurde in einem US-Gerichtsverfahren explizit mit Kinderarbeit in der Kakaobeschaffung in Verbindung gebracht. Die Zertifizierungen (UTZ, Rainforest Alliance) wirken wie Greenwashing: Sie decken nur Teilmengen ab und ändern nichts an den Strukturen. Wer Nestlé-Produkte aktiv meidet, übt direkten Markendruck aus – genau das Ziel dieses Projekts."
+  },
+  { id: 5, name: "Nestlé Smarties", brand: "Nestlé", icon: "🟡", score: 33, grade: "schlecht",
+    issues: [
+      { color: "dot-red", text: "Nestlés Kakaobeschaffungsprobleme betreffen alle Schokoladenprodukte" },
+      { color: "dot-amber", text: "Künstliche Farbstoffe durch natürliche ersetzt – ein positiver Schritt" },
+      { color: "dot-amber", text: "Kartonverpackung verbessert, Hülle in manchen Märkten noch problematisch" },
+      { color: "dot-green", text: "Zuckerreduzierung in EU-Märkten in Arbeit" }
+    ],
+    summary: "Smarties profitiert von einigen Verbesserungen bei Verpackung und Zutaten, aber die systemischen Lieferkettenprobleme von Nestlé belasten die Gesamtbewertung erheblich.",
+    aiAnalysis: "Die KI bewertet Smarties als ein Produkt mit echter Reformbereitschaft auf Rezepturebene – natürliche Farbstoffe und Zuckerreduktion sind nachweisliche Fortschritte. Das Problem liegt nicht im Produkt selbst, sondern im Konzern dahinter. Solange Nestlés Kakao-Lieferkette nicht grundlegend reformiert wird, bleibt auch Smarties Teil eines problematischen Systems."
+  },
+  { id: 6, name: "Kinder Überraschung", brand: "Kinder", icon: "🥚", score: 41, grade: "mittel",
+    issues: [
+      { color: "dot-amber", text: "Plastikspielzeug im Inneren steht trotz recycelbarer Hülle in der Kritik" },
+      { color: "dot-amber", text: "Kakaobeschaffung: Kinderarbeitsrisiken in Westafrika nicht vollständig beseitigt" },
+      { color: "dot-amber", text: "Stark auf Kinder ausgerichtetes Marketing – wirft ethische Werbefragen auf" },
+      { color: "dot-green", text: "Ferrero hat künstliche Zusatzstoffe in jüngsten Rezepturen reduziert" }
+    ],
+    summary: "Kinder Überraschung steht vor dem Spannungsfeld zwischen eingebettetem Plastikspielzeug und Nachhaltigkeitszielen – ergänzt durch die typischen Kakao-Lieferkettenprobleme der Kinder-Linie.",
+    aiAnalysis: "Die KI hebt ein oft übersehenes Problem hervor: Das Marketing von Kinder Überraschung richtet sich primär an Kinder unter 10 Jahren. Dies ist ethisch kritisch, da Kinder keine informierten Kaufentscheidungen treffen können. Das eingebettete Plastikspielzeug widerspricht zudem klar den EU-Nachhaltigkeitszielen. Ein typisches Beispiel für Produkte, bei denen die gesamte Geschäftsstrategie hinterfragt werden sollte."
+  },
+  { id: 7, name: "Nestlé Milkybar", brand: "Nestlé", icon: "🍦", score: 35, grade: "schlecht",
+    issues: [
+      { color: "dot-red", text: "Nestlés allgemeines CSR-Profil belastet alle Produktlinien" },
+      { color: "dot-amber", text: "Weiße Schokolade enthält Kakaobutter – Teil der problematischen Lieferkette" },
+      { color: "dot-green", text: "UK-Milkybar mit 30 % weniger Zucker reformuliert – seltene positive Maßnahme" }
+    ],
+    summary: "Milkybar trägt das Gewicht von Nestlés breitem ethischen Ruf. Die Zuckerreduzierung ist bemerkenswert, tieferliegende Lieferkettenprobleme bleiben jedoch ungelöst.",
+    aiAnalysis: "Die KI bewertet die Zuckerreduktion von Milkybar als eines der wenigen konkreten, messbaren Nachhaltigkeitsergebnisse bei Nestlé. Leider ändert das nichts an der Konzernstruktur. Weiße Schokolade enthält Kakaobutter – der Ursprung dieser Kakaobutter ist genauso problematisch wie bei dunkler Schokolade. Verbraucher sollten sich nicht von der helleren Farbe täuschen lassen."
+  },
+  { id: 8, name: "Raffaello", brand: "Ferrero", icon: "🌸", score: 52, grade: "gut",
+    issues: [
+      { color: "dot-amber", text: "Kokosnuss-Lieferkette wenig geprüft, Arbeitsrisiken auf den Philippinen möglich" },
+      { color: "dot-amber", text: "Palmöl enthalten – übliche Ferrero-RSPO-Einschränkungen gelten" },
+      { color: "dot-green", text: "Kein Kakao – vermeidet damit die gravierendsten Lieferkettenprobleme" },
+      { color: "dot-green", text: "Mandelbeschaffung gilt als risikoärmer als Haselnüsse oder Kakao" }
+    ],
+    summary: "Raffaello ist eines der ethisch vertretbareren Produkte in diesem Vergleich. Das Fehlen von Kakao beseitigt die schwerwiegendsten Bedenken, obwohl Palmöl und Kokos weiter beobachtet werden sollten.",
+    aiAnalysis: "Im direkten Vergleich der acht Produkte schlägt Raffaello alle anderen – hauptsächlich durch Abwesenheit: kein Kakao bedeutet keine Kinderarbeits-Risiken aus Westafrika. Die KI warnt aber, dass die Kokosnuss-Lieferkette zunehmend unter NGO-Beobachtung gerät, insbesondere bezüglich Arbeitsbedingungen auf den Philippinen. Raffaello ist das am wenigsten problematische Produkt hier, bleibt aber weit von echter Nachhaltigkeit entfernt."
+  }
+];
+
+let currentBrand = 'all';
+let selectedId = null;
+
+function getVisible() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  return products.filter(p =>
+    (currentBrand === 'all' || p.brand === currentBrand) &&
+    (p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q))
+  );
+}
+
+function renderGrid() {
+  const visible = getVisible();
+  const grid = document.getElementById('productsGrid');
+  const label = document.getElementById('gridLabel');
+  label.textContent = visible.length + ' Produkt' + (visible.length !== 1 ? 'e' : '');
+  grid.innerHTML = visible.map(p => `
+    <div class="product-card${selectedId === p.id ? ' selected' : ''}" onclick="selectProduct(${p.id})">
+      <div class="product-icon">${p.icon}</div>
+      <div class="product-name">${p.name}</div>
+      <div class="product-brand">${p.brand}</div>
+    </div>
+  `).join('');
+}
+
+function selectProduct(id) {
+  selectedId = id;
+  renderGrid();
+  renderResult();
+}
+
+function toggleAI(id) {
+  const body = document.getElementById('ai-body-' + id);
+  const arrow = document.getElementById('ai-arrow-' + id);
+  if (body.classList.contains('open')) {
+    body.classList.remove('open');
+    arrow.textContent = '▸';
+  } else {
+    body.classList.add('open');
+    arrow.textContent = '▾';
+  }
+}
+
+function renderResult() {
+  const area = document.getElementById('resultArea');
+  if (!selectedId) { area.innerHTML = ''; return; }
+  const p = products.find(x => x.id === selectedId);
+  if (!p) return;
+  const labelMap = { schlecht: 'Schlecht', mittel: 'Mittel', gut: 'Gut' };
+  area.innerHTML = `
+    <div class="result-card">
+      <div class="result-header">
+        <div>
+          <div class="result-title">${p.name}</div>
+          <div class="result-brand-tag">${p.brand}</div>
+        </div>
+        <div class="score-badge ${p.grade}">
+          <div class="score-num">${p.score}</div>
+          <div class="score-label">${labelMap[p.grade]}</div>
+        </div>
+      </div>
+      <ul class="issues">
+        ${p.issues.map(i => `<li><span class="issue-dot ${i.color}"></span>${i.text}</li>`).join('')}
+      </ul>
+      <div class="result-summary">${p.summary}</div>
+      <div class="ai-box">
+        <div class="ai-header" onclick="toggleAI(${p.id})">
+          <div class="ai-dot"></div>
+          <span class="ai-header-label">KI-Tiefenanalyse</span>
+          <span id="ai-arrow-${p.id}" style="font-size:12px; color:var(--color-text-secondary);">▸</span>
+        </div>
+        <div class="ai-body" id="ai-body-${p.id}">${p.aiAnalysis}</div>
+      </div>
+    </div>
+  `;
+  area.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function filterBrand(brand, el) {
+  currentBrand = brand;
+  document.querySelectorAll('.brand-tab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  selectedId = null;
+  document.getElementById('resultArea').innerHTML = '';
+  renderGrid();
+}
+
+function filterProducts() {
+  selectedId = null;
+  document.getElementById('resultArea').innerHTML = '';
+  renderGrid();
+}
+
+function scanSelected() {
+  if (selectedId) { renderResult(); return; }
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  if (q) {
+    const match = products.find(p => p.name.toLowerCase().includes(q));
+    if (match) { selectProduct(match.id); return; }
+  }
+  const visible = getVisible();
+  if (visible.length === 1) { selectProduct(visible[0].id); }
+}
+
+renderGrid();
+
+function showExternalProduct(p) {
+
+  document.getElementById("resultArea").innerHTML = `
+    <div class="result-card">
+
+      <div class="result-header">
+        <div>
+          <div class="result-title">${p.product_name || "Unbekannt"}</div>
+          <div class="result-brand-tag">${p.brands || ""}</div>
+        </div>
+      </div>
+
+      <div class="result-summary">
+
+        <strong>Allgemein</strong><br>
+        Marke: ${p.brands || "-"}<br>
+        Kategorie: ${p.categories || "-"}<br>
+        Herkunft: ${p.countries || "-"}<br><br>
+
+        <strong>Nährwerte (pro 100g)</strong><br>
+        Energie: ${p.nutriments?.energy_kcal_100g || "-"} kcal<br>
+        Zucker: ${p.nutriments?.sugars_100g || "-"} g<br>
+        Fett: ${p.nutriments?.fat_100g || "-"} g<br>
+        Salz: ${p.nutriments?.salt_100g || "-"} g<br><br>
+
+        <strong>Bewertungen</strong><br>
+        Nutri-Score: ${p.nutriscore_grade || "-"}<br>
+        Nova-Gruppe: ${p.nova_group || "-"}<br>
+        Eco-Score: ${p.ecoscore_grade || "-"}<br><br>
+
+        <strong>Zutaten</strong><br>
+        ${p.ingredients_text || "Keine Daten"}<br><br>
+
+        <strong>Allergene</strong><br>
+        ${p.allergens || "Keine Daten"}<br><br>
+
+        <strong>Labels</strong><br>
+        ${p.labels || "Keine"}<br><br>
+
+        <strong>Zusatzstoffe</strong><br>
+        ${p.additives_tags ? p.additives_tags.join(", ") : "Keine Daten"}<br><br>
+
+      </div>
+
+      <button onclick="toggleRaw()" class="ai-analyse-btn">
+        🔍 Rohdaten anzeigen
+      </button>
+
+      <div id="rawData" style="display:none; margin-top:10px;">
+        <pre style="white-space: pre-wrap; font-size:11px;">
+${JSON.stringify(p, null, 2)}
+        </pre>
+      </div>
+
+    </div>
+  `;
+}
+
+function toggleRaw() {
+  const el = document.getElementById("rawData");
+  el.style.display = el.style.display === "none" ? "block" : "none";
+}
+
+function startScanner() {
+  const html5QrCode = new Html5Qrcode("reader");
+
+  html5QrCode.start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: 250 },
+    async (decodedText) => {
+
+      html5QrCode.stop();
+
+      try {
+        const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${decodedText}.json`);
+        const data = await res.json();
+
+        if (data.status === 1) {
+          const p = data.product;
+
+          showExternalProduct(p);
+
+        } else {
+          alert("Produkt nicht gefunden");
+        }
+
+      } catch (err) {
+        console.error(err);
+        alert("Fehler beim Laden der Daten");
+      }
+    }
+  );
+}
+</script>
